@@ -14,6 +14,8 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.HashMap;
+
 import br.com.victorpettengill.hawk_eyedcitizen.utils.Utils;
 
 /**
@@ -88,6 +90,14 @@ public class UserDao {
     }
 
     private void registerUserReference(String uid, String name, String email, String imageUrl) {
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("email", email);
+        map.put("image", imageUrl);
+
+        reference.child("Users").child(uid).setValue(map);
+
 
     }
 
