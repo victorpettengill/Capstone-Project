@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Hawk-Eyed Citizen</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="create_new_account">No account yet? Create one</string>
+
+    <string name="facebook_app_id">161829987778226</string>
+    <string name="fb_login_protocol_scheme">fb161829987778226</string>
+    <string name="login">Login</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="name_hint">Name</string>
+    <string name="create_account">Create account</string>
+    <string name="name_error">Name must have more than 3 characters</string>
+    <string name="email_error">Type a valid Email.</string>
+    <string name="password_error">Password needs at least 6 characters.</string>
+
+</resources>

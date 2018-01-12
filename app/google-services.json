@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "896372227662",
+    "firebase_url": "https://hawk-eyed-citizen.firebaseio.com",
+    "project_id": "hawk-eyed-citizen",
+    "storage_bucket": "hawk-eyed-citizen.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896372227662:android:4f4accfad5af0b2f",
+        "android_client_info": {
+          "package_name": "br.com.victorpettengill.hawk_eyedcitizen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "896372227662-5ph3dk3gerou949ufhk3ntl9qprg9q1k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7IIiyRkAmQaGk3L_ufpBSjAY7hg348Gs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
