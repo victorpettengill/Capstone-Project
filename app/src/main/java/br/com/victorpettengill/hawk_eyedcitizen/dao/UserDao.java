@@ -204,9 +204,10 @@ public class UserDao {
 
                         }
 
-
                     }
                 });
+
+        request.executeAsync();
 
         AuthCredential credential = FacebookAuthProvider.getCredential(result.getAccessToken().getToken());
         FirebaseAuth.getInstance().signInWithCredential(credential)
