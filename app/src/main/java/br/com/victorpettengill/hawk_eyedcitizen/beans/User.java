@@ -1,15 +1,31 @@
 package br.com.victorpettengill.hawk_eyedcitizen.beans;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import br.com.victorpettengill.hawk_eyedcitizen.application.HawkEyedCitizen;
+
 /**
  * Created by appimagetech on 12/01/18.
  */
 
 public class User {
 
-    public String uid;
-    public String name;
-    public String email;
-    public String image;
+    private String uid;
+    private String name;
+    private String email;
+    private String image;
+
+    public User() {
+
+    }
+
+    public User(String uid, String name, String email, String image) {
+        this.uid = uid;
+        this.name = name;
+        this.email = email;
+        this.image = image;
+    }
 
     public String getUid() {
         return uid;
@@ -42,4 +58,34 @@ public class User {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public void saveInstance() {
+
+        SharedPreferences sharedPreferences = HawkEyedCitizen.getAppContext().getSharedPreferences(
+                "userinfo",
+                Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("uid", uid);
+        editor.putString("name", name);
+        editor.putString("email", email);
+        editor.putString("image", image);
+        editor.apply();
+
+    }
+
+    public static User getInstance() {
+
+        SharedPreferences sharedPreferences = HawkEyedCitizen.getAppContext().getSharedPreferences(
+                "userinfo",
+                Context.MODE_PRIVATE);
+
+        return new User(
+                sharedPreferences.getString("uid", null),
+                sharedPreferences.getString("name", null),
+                sharedPreferences.getString("email", null),
+                sharedPreferences.getString("image", null)
+        );
+    }
+
 }

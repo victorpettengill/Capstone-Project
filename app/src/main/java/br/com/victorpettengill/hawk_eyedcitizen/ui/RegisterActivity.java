@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
@@ -15,14 +16,21 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
+import br.com.victorpettengill.hawk_eyedcitizen.beans.User;
+import br.com.victorpettengill.hawk_eyedcitizen.dao.UserDao;
+import br.com.victorpettengill.hawk_eyedcitizen.listeners.DaoListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    @BindView(R.id.content) View content;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
+    @BindView(R.id.coordinator) CoordinatorLayout coordinator;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.image) ImageView image;
     @BindView(R.id.name) TextInputLayout nameLayout;
@@ -34,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
     @BindView(R.id.create_account) Button createAccount;
 
     private final int REQUEST_IMAGE_CAPTURE = 1;
-
+    private Bitmap imageBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +71,39 @@ public class RegisterActivity extends AppCompatActivity {
 
         if(validate()) {
 
+            content.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
 
+            UserDao.getInstance().signUp(
+                    imageBitmap,
+                    name.getText().toString(),
+                    email.getText().toString(),
+                    password.getText().toString(),
+                    new DaoListener() {
+                        @Override
+                        public void onSuccess(Object object) {
+
+                            content.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.INVISIBLE);
+
+                            User user = (User) object;
+                            user.saveInstance();
+
+                            setResult(RESULT_OK);
+                            finish();
+
+                        }
+
+                        @Override
+                        public void onError(String message) {
+
+                            content.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.INVISIBLE);
+
+                            Snackbar.make(coordinator, message, Snackbar.LENGTH_LONG).show();
+
+                        }
+                    });
 
         }
 
@@ -71,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private boolean validate() {
 
-        if(name.getText().toString().length() > 3) {
+        if(name.getText().toString().length() < 3) {
             nameLayout.setError(getString(R.string.name_error));
             name.requestFocus();
             return false;
@@ -83,7 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         }
 
-        if(password.getText().toString().length() > 3) {
+        if(password.getText().toString().length() < 3) {
             passwordLayout.setError(getString(R.string.password_error));
             password.requestFocus();
             return false;
@@ -96,8 +136,6 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
-
-            Bitmap imageBitmap = null;
 
             if (extras != null) {
                 imageBitmap = (Bitmap) extras.get("data");

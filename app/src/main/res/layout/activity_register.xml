@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/coordinator"
     tools:context="br.com.victorpettengill.hawk_eyedcitizen.ui.RegisterActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -20,6 +21,14 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_register" />
+    <include layout="@layout/content_register"
+        android:id="@+id/content"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        android:id="@+id/progress_bar"/>
 
 </android.support.design.widget.CoordinatorLayout>
