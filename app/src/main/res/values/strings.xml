@@ -23,5 +23,12 @@
     <string name="email_error">Type a valid Email.</string>
     <string name="password_error">Password needs at least 6 characters.</string>
     <string name="server_id_token">896372227662-5ph3dk3gerou949ufhk3ntl9qprg9q1k.apps.googleusercontent.com</string>
+    <string name="facebook_cancel_login">User cancelled login!</string>
+    <string name="select_image">Select image from:</string>
+
+    <string-array name="image_options">
+        <item>Gallery</item>
+        <item>Camera</item>
+    </string-array>
 
 </resources>

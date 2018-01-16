@@ -3,6 +3,7 @@
     package="br.com.victorpettengill.hawk_eyedcitizen">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature android:name="android.hardware.camera"
@@ -71,6 +72,12 @@
                 android:value=".ui.LoginActivity" />
 
         </activity>
+
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Base.Theme.AppCompat" />
+
     </application>
 
 </manifest>

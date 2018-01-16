@@ -8,6 +8,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -27,6 +28,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
+import br.com.victorpettengill.hawk_eyedcitizen.beans.User;
 import br.com.victorpettengill.hawk_eyedcitizen.dao.UserDao;
 import br.com.victorpettengill.hawk_eyedcitizen.listeners.DaoListener;
 import butterknife.BindView;
@@ -69,22 +71,27 @@ public class LoginActivity extends AppCompatActivity {
     private void initFacebookLogin() {
 
         callbackManager = CallbackManager.Factory.create();
-
         facebookLogin.setReadPermissions("email", "public_profile");
         facebookLogin.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
             @Override
             public void onSuccess(LoginResult loginResult) {
 
+                handleFacebookLogin(loginResult);
+
             }
 
             @Override
             public void onCancel() {
 
+                Snackbar.make(content, R.string.facebook_cancel_login, Snackbar.LENGTH_LONG).show();
+
             }
 
             @Override
             public void onError(FacebookException error) {
+
+                Snackbar.make(content, error.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
 
             }
         });
@@ -103,7 +110,57 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    @OnClick(R.id.close) void onCloseClicked() {
+
+        finish();
+
+    }
+
     @OnClick(R.id.login) void onLoginClicked() {
+
+        if(!Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
+            emailLayout.setError(getString(R.string.email_error));
+            email.requestFocus();
+            return;
+        }
+
+        if(password.getText().toString().length() < 3) {
+            passwordLayout.setError(getString(R.string.password_error));
+            password.requestFocus();
+            return;
+        }
+
+        showLoading();
+
+        UserDao.getInstance().login(
+                email.getText().toString(),
+                password.getText().toString(),
+                new DaoListener() {
+
+            @Override
+            public void onSuccess(Object object) {
+
+                hideLoading();
+
+                User user = (User) object;
+                user.saveInstance();
+
+                finish();
+
+                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(i);
+
+            }
+
+            @Override
+            public void onError(String message) {
+
+                hideLoading();
+
+                Snackbar.make(content, message, Snackbar.LENGTH_LONG).show();
+
+            }
+        });
 
     }
 
@@ -168,11 +225,43 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    private void handleFacebookLogin(LoginResult result) {
+
+        showLoading();
+
+        UserDao.getInstance().loginWithFacebook(result, new DaoListener() {
+            @Override
+            public void onSuccess(Object object) {
+
+                User user = (User) object;
+                user.saveInstance();
+
+                finish();
+
+                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(i);
+
+            }
+
+            @Override
+            public void onError(String message) {
+
+                hideLoading();
+                Snackbar.make(content, message, Snackbar.LENGTH_LONG).show();
+
+            }
+        });
+
+    }
+
     private void handleGoogleLogin(GoogleSignInAccount account) {
 
         UserDao.getInstance().loginWithGoogle(account, new DaoListener() {
             @Override
             public void onSuccess(Object object) {
+
+                User user = (User) object;
+                user.saveInstance();
 
                 finish();
 
