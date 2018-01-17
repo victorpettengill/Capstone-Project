@@ -19,12 +19,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -32,6 +35,7 @@ import br.com.victorpettengill.hawk_eyedcitizen.R;
 import br.com.victorpettengill.hawk_eyedcitizen.beans.User;
 import br.com.victorpettengill.hawk_eyedcitizen.dao.UserDao;
 import br.com.victorpettengill.hawk_eyedcitizen.listeners.DaoListener;
+import br.com.victorpettengill.hawk_eyedcitizen.utils.CircleTransform;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -167,6 +171,10 @@ public class RegisterActivity extends AppCompatActivity {
             content.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
 
+            image.setDrawingCacheEnabled(true);
+            image.buildDrawingCache();
+            imageBitmap = image.getDrawingCache();
+
             UserDao.getInstance().signUp(
                     imageBitmap,
                     name.getText().toString(),
@@ -228,7 +236,11 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            Picasso.with(this).load(result.getUri()).fit().centerCrop().transform(new CircleTransform()).into(image);
 
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
