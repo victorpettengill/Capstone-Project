@@ -80,12 +80,20 @@ public class User {
                 "userinfo",
                 Context.MODE_PRIVATE);
 
-        return new User(
-                sharedPreferences.getString("uid", null),
-                sharedPreferences.getString("name", null),
-                sharedPreferences.getString("email", null),
-                sharedPreferences.getString("image", null)
-        );
+        User user = null;
+
+        if(sharedPreferences.getString("uid", null) != null) {
+
+            user = new User(
+                    sharedPreferences.getString("uid", null),
+                    sharedPreferences.getString("name", null),
+                    sharedPreferences.getString("email", null),
+                    sharedPreferences.getString("image", null)
+            );
+
+        }
+
+        return user;
     }
 
 }
