@@ -35,6 +35,7 @@
     <string name="description_hint">Problem description</string>
     <string name="location">Location</string>
     <string name="current_location">Current location</string>
+    <string name="save">Save</string>
 
     <string-array name="problem_categories">
         <item>Select the category</item>
