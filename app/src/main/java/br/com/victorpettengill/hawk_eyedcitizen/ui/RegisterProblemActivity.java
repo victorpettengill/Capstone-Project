@@ -3,6 +3,7 @@ package br.com.victorpettengill.hawk_eyedcitizen.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -28,6 +29,9 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
+import br.com.victorpettengill.hawk_eyedcitizen.beans.User;
+import br.com.victorpettengill.hawk_eyedcitizen.dao.ProblemDao;
+import br.com.victorpettengill.hawk_eyedcitizen.listeners.DaoListener;
 import br.com.victorpettengill.hawk_eyedcitizen.utils.CircleTransform;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +47,9 @@ public class RegisterProblemActivity extends AppCompatActivity {
     private final int REQUEST_IMAGE_CAPTURE = 1;
     private final int REQUEST_IMAGE_GALLERY = 3;
     private final int READ_PERMISSION = 5;
+
+    private double latitude;
+    private double longitude;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,8 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
         if(getIntent().getExtras() != null) {
 
-
+            latitude = getIntent().getDoubleExtra("latitude", 0);
+            longitude = getIntent().getDoubleExtra("longitude", 0);
 
         }
 
@@ -66,7 +74,29 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
     private void saveProblem() {
 
+        image.setDrawingCacheEnabled(true);
+        image.buildDrawingCache();
+        Bitmap imageBitmap = image.getDrawingCache();
 
+        ProblemDao.getInstance().registerProblem(User.getInstance(),
+                imageBitmap,
+                categories.getSelectedItem().toString(),
+                description.getText().toString(),
+                latitude,
+                longitude,
+                new DaoListener() {
+                    @Override
+                    public void onSuccess(Object object) {
+
+
+
+                    }
+
+                    @Override
+                    public void onError(String message) {
+
+                    }
+                });
 
     }
 
@@ -74,6 +104,8 @@ public class RegisterProblemActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if(item.getItemId() == R.id.save) {
+
+            saveProblem();
 
             return true;
         } else {

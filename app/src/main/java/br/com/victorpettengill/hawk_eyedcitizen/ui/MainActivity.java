@@ -114,6 +114,14 @@ public class MainActivity extends AppCompatActivity
     @OnClick(R.id.fab) void addProblem() {
 
         Intent i = new Intent(MainActivity.this, RegisterProblemActivity.class);
+
+        if(currentLocation != null) {
+
+            i.putExtra("latitude", currentLocation.getLatitude());
+            i.putExtra("longitude", currentLocation.getLongitude());
+
+        }
+
         startActivity(i);
 
     }

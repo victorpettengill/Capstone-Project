@@ -8,10 +8,28 @@ import com.firebase.geofire.GeoLocation;
 
 public class Problem {
 
+    private String uid;
+    private User user;
     private String image;
     private String category;
     private String description;
     private GeoLocation geoLocation;
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public String getImage() {
         return image;
