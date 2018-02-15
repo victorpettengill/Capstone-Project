@@ -72,6 +72,23 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
     }
 
+    @OnClick(R.id.location) void onLocationClicked() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterProblemActivity.this);
+        builder.setTitle(R.string.location_title);
+        builder.setItems(R.array.location_options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                Intent intent = new Intent(RegisterProblemActivity.this, FindLocationActivity.class);
+                startActivity(intent);
+
+            }
+        });
+        builder.show();
+
+    }
+
     private void saveProblem() {
 
         image.setDrawingCacheEnabled(true);

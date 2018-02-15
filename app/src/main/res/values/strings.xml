@@ -30,12 +30,19 @@
         <item>Gallery</item>
         <item>Camera</item>
     </string-array>
+
+    <string-array name="location_options">
+        <item>Current Location</item>
+        <item>Another Location</item>
+    </string-array>
+
     <string name="title_activity_register_problem">Register a problem</string>
     <string name="add_photo">Add photo</string>
     <string name="description_hint">Problem description</string>
     <string name="location">Location</string>
     <string name="current_location">Current location</string>
     <string name="save">Save</string>
+    <string name="location_title">Where you found the problem?</string>
 
     <string-array name="problem_categories">
         <item>Select the category</item>
@@ -43,5 +50,6 @@
         <item>Leak</item>
         <item>Traffic signal</item>
     </string-array>
+    <string name="title_activity_find_location">Other Location</string>
 
 </resources>
