@@ -1,11 +1,16 @@
 package br.com.victorpettengill.hawk_eyedcitizen.ui;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
@@ -25,10 +30,15 @@ import java.util.List;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
 
-public class FindLocationActivity extends FragmentActivity implements OnMapReadyCallback {
+public class FindLocationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private final String TAG = "FindLocation";
+    private Marker marker;
+
+    private double latitude;
+    private double longitude;
+    private String location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +49,11 @@ public class FindLocationActivity extends FragmentActivity implements OnMapReady
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
@@ -46,27 +61,55 @@ public class FindLocationActivity extends FragmentActivity implements OnMapReady
             @Override
             public void onPlaceSelected(Place place) {
 
+                latitude = place.getLatLng().latitude;
+                longitude = place.getLatLng().longitude;
 
-                Log.i(TAG, "Place: " + place.getName());
+                location = place.getAddress().toString();
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         place.getLatLng(),
                         13));
 
-                Marker marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getAddress().toString()));
+                marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getAddress().toString()));
                 marker.setDraggable(true);
 
             }
 
             @Override
             public void onError(Status status) {
-                // TODO: Solucionar o erro.
                 Log.i(TAG, "Ocorreu um erro: " + status);
             }
         });
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId() == R.id.save) {
+
+            Intent i = new Intent();
+            i.putExtra("latitude", latitude);
+            i.putExtra("longitude", longitude);
+            i.putExtra("location", location);
+
+            setResult(RESULT_OK, i);
+            finish();
+
+        } else {
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_done, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -86,7 +129,10 @@ public class FindLocationActivity extends FragmentActivity implements OnMapReady
             @Override
             public void onMarkerDragEnd(Marker marker) {
 
+                latitude = marker.getPosition().latitude;
+                longitude = marker.getPosition().longitude;
 
+                new AddressTask().execute(marker.getPosition().latitude, marker.getPosition().longitude);
 
             }
         });
@@ -108,7 +154,7 @@ public class FindLocationActivity extends FragmentActivity implements OnMapReady
             List<Address> addresses = null;
 
             try {
-                addresses = geocoder.getFromLocation(doubles[0], doubles[1], 10);
+                addresses = geocoder.getFromLocation(doubles[0], doubles[1], 1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -119,6 +165,21 @@ public class FindLocationActivity extends FragmentActivity implements OnMapReady
         @Override
         protected void onPostExecute(List<Address> addresses) {
             super.onPostExecute(addresses);
+
+            if(addresses != null && addresses.size() > 0) {
+
+                StringBuilder builder = new StringBuilder();
+
+                for(int i=0; i < addresses.get(0).getMaxAddressLineIndex(); i++) {
+                    builder.append(addresses.get(0).getAddressLine(i));
+                }
+
+                marker.setTitle(builder.toString());
+                location = builder.toString();
+                marker.showInfoWindow();
+
+            }
+
         }
 
     }

@@ -8,8 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,18 +19,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
-import com.firebase.geofire.GeoFire;
 import com.squareup.picasso.Picasso;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
 import br.com.victorpettengill.hawk_eyedcitizen.beans.User;
 import br.com.victorpettengill.hawk_eyedcitizen.dao.ProblemDao;
 import br.com.victorpettengill.hawk_eyedcitizen.listeners.DaoListener;
-import br.com.victorpettengill.hawk_eyedcitizen.utils.CircleTransform;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -43,10 +39,13 @@ public class RegisterProblemActivity extends AppCompatActivity {
     @BindView(R.id.category) Spinner categories;
     @BindView(R.id.description) TextInputEditText description;
     @BindView(R.id.location) Button location;
+    @BindView(R.id.other_address) TextView otherAddress;
+    @BindView(R.id.loading) LinearLayout loading;
 
     private final int REQUEST_IMAGE_CAPTURE = 1;
     private final int REQUEST_IMAGE_GALLERY = 3;
     private final int READ_PERMISSION = 5;
+    private final int REQUEST_OTHER_LOCATION = 8;
 
     private double latitude;
     private double longitude;
@@ -80,8 +79,14 @@ public class RegisterProblemActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                Intent intent = new Intent(RegisterProblemActivity.this, FindLocationActivity.class);
-                startActivity(intent);
+                if(i == 1) {
+
+                    Intent intent = new Intent(RegisterProblemActivity.this, FindLocationActivity.class);
+                    startActivityForResult(intent, REQUEST_OTHER_LOCATION);
+
+                } else {
+
+                }
 
             }
         });
@@ -89,11 +94,24 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
     }
 
+    private void validate() {
+
+        if(categories.getSelectedItemPosition() == 0) {
+            return;
+        }
+
+        if(description.getText().toString().equals("")) {
+
+        }
+    }
+
     private void saveProblem() {
 
         image.setDrawingCacheEnabled(true);
         image.buildDrawingCache();
         Bitmap imageBitmap = image.getDrawingCache();
+
+        loading.setVisibility(View.VISIBLE);
 
         ProblemDao.getInstance().registerProblem(User.getInstance(),
                 imageBitmap,
@@ -105,12 +123,14 @@ public class RegisterProblemActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Object object) {
 
-
+                        loading.setVisibility(View.GONE);
 
                     }
 
                     @Override
                     public void onError(String message) {
+
+                        loading.setVisibility(View.GONE);
 
                     }
                 });
@@ -133,7 +153,7 @@ public class RegisterProblemActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.menu_register_problem, menu);
+        getMenuInflater().inflate(R.menu.menu_done, menu);
 
         return true;
     }
@@ -223,8 +243,14 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
             Picasso.with(this).load(selectedImageUri).fit().centerCrop().into(image);
 
-        }
+        } else if(requestCode == REQUEST_OTHER_LOCATION && resultCode == RESULT_OK) {
 
+            location.setText(getString(R.string.title_activity_find_location));
+            otherAddress.setText(data.getStringExtra("location"));
+            latitude = data.getDoubleExtra("latitude", 0);
+            longitude = data.getDoubleExtra("longitude", 0);
+
+        }
 
     }
 
