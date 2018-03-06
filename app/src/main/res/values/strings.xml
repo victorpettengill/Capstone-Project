@@ -51,5 +51,7 @@
         <item>Traffic signal</item>
     </string-array>
     <string name="title_activity_find_location">Other Location</string>
+    <string name="success">Problem registered successfully!</string>
+    <string name="loading">Loading...</string>
 
 </resources>

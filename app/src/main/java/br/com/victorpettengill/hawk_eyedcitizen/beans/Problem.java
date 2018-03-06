@@ -1,12 +1,15 @@
 package br.com.victorpettengill.hawk_eyedcitizen.beans;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.firebase.geofire.GeoLocation;
 
 /**
  * Created by appimagetech on 11/01/18.
  */
 
-public class Problem {
+public class Problem implements Parcelable{
 
     private String uid;
     private User user;
@@ -14,6 +17,28 @@ public class Problem {
     private String category;
     private String description;
     private GeoLocation geoLocation;
+
+    public Problem() {
+    }
+
+    protected Problem(Parcel in) {
+        uid = in.readString();
+        image = in.readString();
+        category = in.readString();
+        description = in.readString();
+    }
+
+    public static final Creator<Problem> CREATOR = new Creator<Problem>() {
+        @Override
+        public Problem createFromParcel(Parcel in) {
+            return new Problem(in);
+        }
+
+        @Override
+        public Problem[] newArray(int size) {
+            return new Problem[size];
+        }
+    };
 
     public String getUid() {
         return uid;
@@ -61,5 +86,18 @@ public class Problem {
 
     public void setGeoLocation(GeoLocation geoLocation) {
         this.geoLocation = geoLocation;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(uid);
+        parcel.writeString(image);
+        parcel.writeString(category);
+        parcel.writeString(description);
     }
 }

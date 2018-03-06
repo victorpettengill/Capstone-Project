@@ -1,6 +1,7 @@
 package br.com.victorpettengill.hawk_eyedcitizen.dao;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -12,6 +13,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.HashMap;
 
 import br.com.victorpettengill.hawk_eyedcitizen.beans.Problem;
@@ -48,7 +50,7 @@ public class ProblemDao {
     }
 
     public void registerProblem(final User user,
-                                final Bitmap image,
+                                final File image,
                                 final String category,
                                 final String description,
                                 double latitude,
@@ -76,7 +78,7 @@ public class ProblemDao {
                     if(image != null) {
 
                             storageReference.child(problemReference.getKey())
-                                    .putBytes(Utils.bitmapToBytes(image))
+                                    .putFile(Uri.fromFile(image))
                                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
                                         @Override

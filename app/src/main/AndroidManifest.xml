@@ -86,7 +86,18 @@
         </activity>
         <activity
             android:name=".ui.FindLocationActivity"
-            android:label="@string/title_activity_find_location"></activity>
+            android:label="@string/title_activity_find_location"/>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="br.com.victorpettengill.hawk_eyedcitizen.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>
