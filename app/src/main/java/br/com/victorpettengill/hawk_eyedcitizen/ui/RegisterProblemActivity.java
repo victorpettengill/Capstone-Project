@@ -164,7 +164,6 @@ public class RegisterProblemActivity extends AppCompatActivity {
                                 finish();
 
 
-
                             }
                         }).show();
 

@@ -78,12 +78,7 @@
         <activity
             android:name=".ui.RegisterProblemActivity"
             android:label="@string/title_activity_register_problem"
-            android:parentActivityName=".ui.MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity" />
-        </activity>
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".ui.FindLocationActivity"
             android:label="@string/title_activity_find_location"/>
