@@ -5,6 +5,7 @@ import android.net.Uri;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -134,5 +135,17 @@ public class ProblemDao {
         });
 
     }
+
+    public void getProblemsAtBounds() {
+
+
+        final GeoLocation geoLocation = new GeoLocation(0, 90);
+
+        GeoFire geoFire = new GeoFire(reference);
+
+        GeoQuery geoQuery = geoFire.queryAtLocation(geoLocation, 10);
+
+    }
+
 
 }

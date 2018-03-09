@@ -42,7 +42,7 @@
     <string name="location">Location</string>
     <string name="current_location">Current location</string>
     <string name="save">Save</string>
-    <string name="location_title">Where you found the problem?</string>
+    <string name="location_title">Where did you found the problem?</string>
 
     <string-array name="problem_categories">
         <item>Select the category</item>
@@ -52,6 +52,9 @@
     </string-array>
     <string name="title_activity_find_location">Other Location</string>
     <string name="success">Problem registered successfully!</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
+    <string name="select_location">Select location</string>
+    <string name="description_mandatory">Describe the problem found.</string>
+    <string name="category_mandatory">Please select the category</string>
 
 </resources>

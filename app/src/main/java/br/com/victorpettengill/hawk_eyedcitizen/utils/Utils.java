@@ -1,5 +1,8 @@
 package br.com.victorpettengill.hawk_eyedcitizen.utils;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -43,6 +46,21 @@ public class Utils {
         }
 
         return resizedFile;
+    }
+
+    public static void showSimpleAlert(Context context, String title, String message) {
+
+        new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+
     }
 
 }

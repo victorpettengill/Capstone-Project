@@ -1,5 +1,6 @@
 package br.com.victorpettengill.hawk_eyedcitizen.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.location.Location;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -22,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -32,13 +35,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -62,16 +74,23 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
     @BindView(R.id.image) ImageView image;
     @BindView(R.id.category) Spinner categories;
+    @BindView(R.id.description_layout) TextInputLayout descriptionLayout;
     @BindView(R.id.description) TextInputEditText description;
-    @BindView(R.id.location) Button location;
+    @BindView(R.id.location) Button locationButton;
     @BindView(R.id.other_address) TextView otherAddress;
     @BindView(R.id.loading) LinearLayout loading;
     @BindView(R.id.coordinator) CoordinatorLayout coordinator;
+    @BindView(R.id.categorydivider) View categoryDivider;
+    @BindView(R.id.categoryMandatory) TextView categoryMandatory;
 
     private final int REQUEST_IMAGE_CAPTURE = 1;
     private final int REQUEST_IMAGE_GALLERY = 3;
     private final int READ_PERMISSION = 5;
     private final int REQUEST_OTHER_LOCATION = 8;
+
+    private final int LOCATION_PERMISSION = 11;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mLocationCallback;
 
     private double latitude;
     private double longitude;
@@ -93,7 +112,52 @@ public class RegisterProblemActivity extends AppCompatActivity {
             latitude = getIntent().getDoubleExtra("latitude", 0);
             longitude = getIntent().getDoubleExtra("longitude", 0);
 
+        } else {
+
+            locationButton.setText(R.string.select_location);
+
         }
+
+        categories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                categoryDivider.setBackgroundColor(getResources().getColor(R.color.divider));
+                categoryMandatory.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mLocationCallback = new LocationCallback() {
+
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+
+                loading.setVisibility(View.GONE);
+
+                Log.i("result", "locationButton result");
+
+                if(locationResult != null) {
+
+                    Location location = locationResult.getLastLocation();
+
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+
+                    locationButton.setText(getString(R.string.current_location));
+
+                    mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+
+                }
+
+            }
+        };
+
 
     }
 
@@ -112,7 +176,27 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
                 } else {
 
+                    if (ContextCompat.checkSelfPermission(RegisterProblemActivity.this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
 
+                        // Should we show an explanation?
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(RegisterProblemActivity.this,
+                                Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                        } else {
+
+                            ActivityCompat.requestPermissions(RegisterProblemActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    LOCATION_PERMISSION);
+
+                        }
+
+                    } else {
+
+                        requestLocation();
+
+                    }
 
                 }
 
@@ -125,12 +209,28 @@ public class RegisterProblemActivity extends AppCompatActivity {
     private void validate() {
 
         if(categories.getSelectedItemPosition() == 0) {
+            categoryDivider.setBackgroundColor(getResources().getColor(R.color.error_color));
+            categoryMandatory.setVisibility(View.VISIBLE);
             return;
+        } else {
+            categoryDivider.setBackgroundColor(getResources().getColor(R.color.divider));
+            categoryMandatory.setVisibility(View.INVISIBLE);
         }
 
         if(description.getText().toString().equals("")) {
-
+            descriptionLayout.setError(getString(R.string.description_mandatory));
+            return;
         }
+
+        if(latitude == 0 && longitude == 0) {
+            Utils.showSimpleAlert(RegisterProblemActivity.this,
+                    "Oops!",
+                    "You must select a locationButton to register the problem");
+            return;
+        }
+
+        saveProblem();
+
     }
 
     private void saveProblem() {
@@ -187,7 +287,7 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
         if(item.getItemId() == R.id.save) {
 
-            saveProblem();
+            validate();
 
             return true;
         } else {
@@ -290,8 +390,8 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
         } else if(requestCode == REQUEST_OTHER_LOCATION && resultCode == RESULT_OK) {
 
-            location.setText(getString(R.string.title_activity_find_location));
-            otherAddress.setText(data.getStringExtra("location"));
+            locationButton.setText(getString(R.string.title_activity_find_location));
+            otherAddress.setText(data.getStringExtra("locationButton"));
             latitude = data.getDoubleExtra("latitude", 0);
             longitude = data.getDoubleExtra("longitude", 0);
 
@@ -311,6 +411,10 @@ public class RegisterProblemActivity extends AppCompatActivity {
             if (galleryIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
             }
+
+        } else if(requestCode == LOCATION_PERMISSION && grantResults.length > 0) {
+
+            requestLocation();
 
         }
 
@@ -561,5 +665,54 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
         return correctBmp;
     }
+
+    @SuppressLint("MissingPermission")
+    private void requestLocation() {
+
+        loading.setVisibility(View.VISIBLE);
+
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+
+                Log.i("fused", "sucesss");
+
+                if(location != null) {
+
+                    loading.setVisibility(View.GONE);
+
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+
+                    locationButton.setText(getString(R.string.current_location));
+
+                } else {
+
+                    Log.i("fused", "sucesss - null");
+
+                    LocationRequest mLocationRequest = new LocationRequest();
+                    mLocationRequest.setInterval(10000);
+                    mLocationRequest.setFastestInterval(0);
+                    mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+                    mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                            mLocationCallback, null);
+
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                loading.setVisibility(View.GONE);
+
+                Log.e("fused", "error", e);
+
+            }
+        });
+
+    }
+
 
 }

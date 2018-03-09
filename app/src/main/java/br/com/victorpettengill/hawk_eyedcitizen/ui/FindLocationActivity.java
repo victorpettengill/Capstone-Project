@@ -77,7 +77,7 @@ public class FindLocationActivity extends AppCompatActivity implements OnMapRead
 
             @Override
             public void onError(Status status) {
-                Log.i(TAG, "Ocorreu um erro: " + status);
+                Log.i(TAG, "An error has occured: " + status);
             }
         });
 
@@ -91,7 +91,7 @@ public class FindLocationActivity extends AppCompatActivity implements OnMapRead
             Intent i = new Intent();
             i.putExtra("latitude", latitude);
             i.putExtra("longitude", longitude);
-            i.putExtra("location", location);
+            i.putExtra("locationButton", location);
 
             setResult(RESULT_OK, i);
             finish();

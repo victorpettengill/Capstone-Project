@@ -36,12 +36,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
+import br.com.victorpettengill.hawk_eyedcitizen.beans.Problem;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     private LocationCallback mLocationCallback;
 
     private Location currentLocation;
+    private final int REQUEST_CREATE_PROBLEM = 13;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
 
-                    Log.i("result", "location result");
+                    Log.i("result", "locationButton result");
 
                     if(locationResult != null) {
 
@@ -122,7 +125,7 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        startActivity(i);
+        startActivityForResult(i, REQUEST_CREATE_PROBLEM);
 
     }
 
@@ -183,6 +186,16 @@ public class MainActivity extends AppCompatActivity
 
         mMap = googleMap;
 
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+
+            @Override
+            public void onCameraIdle() {
+
+
+            }
+
+        });
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -202,6 +215,23 @@ public class MainActivity extends AppCompatActivity
         } else {
 
             requestLocation();
+
+        }
+
+    }
+
+    private void addProblemIntheMap(Problem problem, boolean animateTo) {
+
+        Marker marker = mMap.addMarker(
+                new MarkerOptions().position(
+                        new LatLng(problem.getGeoLocation().latitude,problem.getGeoLocation().longitude)
+                ).title(problem.getCategory()));
+
+        if(animateTo) {
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(problem.getGeoLocation().latitude,problem.getGeoLocation().longitude),
+                    13));
 
         }
 
@@ -262,4 +292,17 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == REQUEST_CREATE_PROBLEM) {
+
+            addProblemIntheMap((Problem) data.getParcelableExtra("problem"), true);
+
+        }
+
+    }
+
 }
