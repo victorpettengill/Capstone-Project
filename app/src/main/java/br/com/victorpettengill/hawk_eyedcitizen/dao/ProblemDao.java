@@ -2,10 +2,12 @@ package br.com.victorpettengill.hawk_eyedcitizen.dao;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.Log;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -138,12 +140,42 @@ public class ProblemDao {
 
     public void getProblemsAtBounds() {
 
-
         final GeoLocation geoLocation = new GeoLocation(0, 90);
 
         GeoFire geoFire = new GeoFire(reference);
 
         GeoQuery geoQuery = geoFire.queryAtLocation(geoLocation, 10);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+
+                Log.i("teste", key);
+
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+                Log.i("error", error.getMessage());
+
+            }
+        });
 
     }
 

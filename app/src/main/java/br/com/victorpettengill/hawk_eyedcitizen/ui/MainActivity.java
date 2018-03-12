@@ -44,6 +44,7 @@ import com.google.android.gms.tasks.Task;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
 import br.com.victorpettengill.hawk_eyedcitizen.beans.Problem;
+import br.com.victorpettengill.hawk_eyedcitizen.dao.ProblemDao;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -97,6 +98,8 @@ public class MainActivity extends AppCompatActivity
                     Log.i("result", "locationButton result");
 
                     if(locationResult != null) {
+
+                        ProblemDao.getInstance().getProblemsAtBounds();
 
                         Location location = locationResult.getLastLocation();
 
@@ -251,6 +254,8 @@ public class MainActivity extends AppCompatActivity
                 if(location != null) {
 
                     currentLocation = location;
+
+                    ProblemDao.getInstance().getProblemsAtBounds();
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(location.getLatitude(), location.getLongitude()),
