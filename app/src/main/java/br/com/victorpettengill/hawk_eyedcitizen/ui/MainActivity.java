@@ -99,9 +99,10 @@ public class MainActivity extends AppCompatActivity
 
                     if(locationResult != null) {
 
-                        ProblemDao.getInstance().getProblemsAtBounds();
 
                         Location location = locationResult.getLastLocation();
+
+                        ProblemDao.getInstance().getProblemsAtBounds(location.getLatitude(), location.getLongitude());
 
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(location.getLatitude(), location.getLongitude()),
@@ -255,7 +256,7 @@ public class MainActivity extends AppCompatActivity
 
                     currentLocation = location;
 
-                    ProblemDao.getInstance().getProblemsAtBounds();
+                    ProblemDao.getInstance().getProblemsAtBounds(currentLocation.getLatitude(), currentLocation.getLongitude());
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(location.getLatitude(), location.getLongitude()),
