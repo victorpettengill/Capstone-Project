@@ -11,23 +11,6 @@ import com.firebase.geofire.GeoLocation;
 
 public class Problem implements Parcelable{
 
-    private String uid;
-    private User user;
-    private String image;
-    private String category;
-    private String description;
-    private GeoLocation geoLocation;
-
-    public Problem() {
-    }
-
-    protected Problem(Parcel in) {
-        uid = in.readString();
-        image = in.readString();
-        category = in.readString();
-        description = in.readString();
-    }
-
     public static final Creator<Problem> CREATOR = new Creator<Problem>() {
         @Override
         public Problem createFromParcel(Parcel in) {
@@ -39,6 +22,30 @@ public class Problem implements Parcelable{
             return new Problem[size];
         }
     };
+    private String uid;
+    private User user;
+    private String image;
+    private String category;
+    private String description;
+    private double latitude;
+    private double longitude;
+
+    public Problem() {
+
+    }
+
+    public Problem(String uid) {
+        this.uid = uid;
+    }
+
+    protected Problem(Parcel in) {
+        uid = in.readString();
+        image = in.readString();
+        category = in.readString();
+        description = in.readString();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+    }
 
     public String getUid() {
         return uid;
@@ -80,12 +87,20 @@ public class Problem implements Parcelable{
         this.description = description;
     }
 
-    public GeoLocation getGeoLocation() {
-        return geoLocation;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setGeoLocation(GeoLocation geoLocation) {
-        this.geoLocation = geoLocation;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override
@@ -99,5 +114,10 @@ public class Problem implements Parcelable{
         parcel.writeString(image);
         parcel.writeString(category);
         parcel.writeString(description);
+        parcel.writeDouble(latitude);
+        parcel.writeDouble(longitude);
     }
+
+
+
 }

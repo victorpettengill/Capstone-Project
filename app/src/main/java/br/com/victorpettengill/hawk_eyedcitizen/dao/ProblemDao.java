@@ -12,9 +12,11 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -34,12 +36,19 @@ import br.com.victorpettengill.hawk_eyedcitizen.utils.Utils;
 public class ProblemDao {
 
     private static ProblemDao dao;
+    private final String PROBLEMS_REFERENCE = "Problems";
+    private final String AREA_REFERENCE = "Area";
     private DatabaseReference reference;
     private DatabaseReference areaReference;
     private StorageReference storageReference;
 
-    private final String PROBLEMS_REFERENCE = "Problems";
-    private final String AREA_REFERENCE = "Area";
+    public ProblemDao() {
+
+        reference = FirebaseDatabase.getInstance().getReference().child(PROBLEMS_REFERENCE);
+        storageReference = FirebaseStorage.getInstance().getReference(PROBLEMS_REFERENCE);
+        areaReference = FirebaseDatabase.getInstance().getReference().child(AREA_REFERENCE);
+
+    }
 
     public static ProblemDao getInstance() {
 
@@ -50,11 +59,24 @@ public class ProblemDao {
         return dao;
     }
 
-    public ProblemDao() {
+    public void getDataForProblem(Problem problem, DaoListener listener) {
 
-        reference = FirebaseDatabase.getInstance().getReference().child(PROBLEMS_REFERENCE);
-        storageReference = FirebaseStorage.getInstance().getReference(PROBLEMS_REFERENCE);
-        areaReference = FirebaseDatabase.getInstance().getReference().child(AREA_REFERENCE);
+        reference.child(problem.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                HashMap<String, Object> valueMap = (HashMap<String, Object>) dataSnapshot.getValue();
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
 
     }
 
@@ -76,11 +98,12 @@ public class ProblemDao {
         final GeoLocation geoLocation = new GeoLocation(latitude, longitude);
 
         final DatabaseReference problemReference = reference.push();
-        problemReference.setValue(map, new OnCompleteListener() {
-            @Override
-            public void onComplete(@NonNull Task task) {
+        problemReference.updateChildren(map, new DatabaseReference.CompletionListener() {
 
-                if(task.isSuccessful()) {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                if(databaseError == null) {
 
                     if(image != null) {
 
@@ -101,7 +124,8 @@ public class ProblemDao {
                                             problem.setImage(taskSnapshot.getDownloadUrl().toString());
                                             problem.setCategory(category);
                                             problem.setDescription(description);
-                                            problem.setGeoLocation(geoLocation);
+                                            problem.setLatitude(geoLocation.latitude);
+                                            problem.setLongitude(geoLocation.longitude);
 
                                             listener.onSuccess(problem);
 
@@ -124,20 +148,24 @@ public class ProblemDao {
                         problem.setUser(user);
                         problem.setCategory(category);
                         problem.setDescription(description);
-                        problem.setGeoLocation(geoLocation);
+                        problem.setLatitude(geoLocation.latitude);
+                        problem.setLongitude(geoLocation.longitude);
 
                         listener.onSuccess(problem);
 
                     }
 
+                } else {
+                    listener.onError("Error saving problem, try again later.");
                 }
 
             }
+
         });
 
 
-        GeoFire geoFire = new GeoFire(areaReference.child(problemReference.getKey()));
-        geoFire.setLocation("geo", geoLocation, new GeoFire.CompletionListener() {
+        GeoFire geoFire = new GeoFire(areaReference);
+        geoFire.setLocation(problemReference.getKey(), geoLocation, new GeoFire.CompletionListener() {
 
             @Override
             public void onComplete(String key, DatabaseError error) {
@@ -155,11 +183,11 @@ public class ProblemDao {
 
     }
 
-    public void getProblemsAtBounds(double latitude, double longitude) {
+    public void getProblemsAtBounds(double latitude, double longitude, final DaoListener listener) {
 
         final GeoLocation geoLocation = new GeoLocation(latitude, longitude);
 
-        GeoFire geoFire = new GeoFire(reference);
+        GeoFire geoFire = new GeoFire(areaReference);
 
         GeoQuery geoQuery = geoFire.queryAtLocation(geoLocation, 1000);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
@@ -167,7 +195,9 @@ public class ProblemDao {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
 
-                Log.i("teste", key);
+                Problem problem = new Problem(key);
+                listener.onObjectAdded(problem);
+
 
             }
 
@@ -189,7 +219,7 @@ public class ProblemDao {
             @Override
             public void onGeoQueryError(DatabaseError error) {
 
-                Log.i("error", error.getMessage());
+                listener.onError(error.getMessage());
 
             }
         });

@@ -45,6 +45,7 @@ import com.google.android.gms.tasks.Task;
 import br.com.victorpettengill.hawk_eyedcitizen.R;
 import br.com.victorpettengill.hawk_eyedcitizen.beans.Problem;
 import br.com.victorpettengill.hawk_eyedcitizen.dao.ProblemDao;
+import br.com.victorpettengill.hawk_eyedcitizen.listeners.DaoListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -53,18 +54,28 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OnMapReadyCallback {
 
+    private final int LOCATION_PERMISSION = 11;
+    private final int REQUEST_CREATE_PROBLEM = 13;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
-
     private GoogleMap mMap;
-
-    private final int LOCATION_PERMISSION = 11;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
-
     private Location currentLocation;
-    private final int REQUEST_CREATE_PROBLEM = 13;
+    private DaoListener listener = new DaoListener() {
+
+        @Override
+        public void onObjectAdded(Object object) {
+
+        }
+
+        @Override
+        public void onError(String message) {
+            super.onError(message);
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +113,7 @@ public class MainActivity extends AppCompatActivity
 
                         Location location = locationResult.getLastLocation();
 
-                        ProblemDao.getInstance().getProblemsAtBounds(location.getLatitude(), location.getLongitude());
+                        ProblemDao.getInstance().getProblemsAtBounds(location.getLatitude(), location.getLongitude(), listener);
 
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(location.getLatitude(), location.getLongitude()),
@@ -228,13 +239,13 @@ public class MainActivity extends AppCompatActivity
 
         Marker marker = mMap.addMarker(
                 new MarkerOptions().position(
-                        new LatLng(problem.getGeoLocation().latitude,problem.getGeoLocation().longitude)
+                        new LatLng(problem.getLatitude(), problem.getLongitude())
                 ).title(problem.getCategory()));
 
         if(animateTo) {
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(problem.getGeoLocation().latitude,problem.getGeoLocation().longitude),
+                    new LatLng(problem.getLatitude(), problem.getLongitude()),
                     13));
 
         }
@@ -256,7 +267,7 @@ public class MainActivity extends AppCompatActivity
 
                     currentLocation = location;
 
-                    ProblemDao.getInstance().getProblemsAtBounds(currentLocation.getLatitude(), currentLocation.getLongitude());
+                    ProblemDao.getInstance().getProblemsAtBounds(currentLocation.getLatitude(), currentLocation.getLongitude(), listener);
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(location.getLatitude(), location.getLongitude()),
