@@ -59,7 +59,7 @@ public class ProblemDao {
         return dao;
     }
 
-    public void getDataForProblem(Problem problem, DaoListener listener) {
+    public void getDataForProblem(final Problem problem, final DaoListener listener) {
 
         reference.child(problem.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -68,6 +68,12 @@ public class ProblemDao {
 
                 HashMap<String, Object> valueMap = (HashMap<String, Object>) dataSnapshot.getValue();
 
+                problem.setCategory((String) valueMap.get("category"));
+                problem.setDescription((String) valueMap.get("description"));
+                problem.setUser(new User((String) valueMap.get("user")));
+                problem.setImage(valueMap.containsKey("image") ? (String) valueMap.get("image") : null);
+
+                listener.onSuccess(problem);
 
             }
 
@@ -196,6 +202,9 @@ public class ProblemDao {
             public void onKeyEntered(String key, GeoLocation location) {
 
                 Problem problem = new Problem(key);
+                problem.setLatitude(location.latitude);
+                problem.setLongitude(location.longitude);
+
                 listener.onObjectAdded(problem);
 
 

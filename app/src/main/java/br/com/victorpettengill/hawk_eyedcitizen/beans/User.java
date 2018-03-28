@@ -20,6 +20,10 @@ public class User {
 
     }
 
+    public User(String uid) {
+        this.uid = uid;
+    }
+
     public User(String uid, String name, String email, String image) {
         this.uid = uid;
         this.name = name;

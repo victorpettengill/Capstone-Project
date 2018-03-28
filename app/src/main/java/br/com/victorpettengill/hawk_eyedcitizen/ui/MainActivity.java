@@ -5,10 +5,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.design.widget.NavigationView;
@@ -21,16 +19,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,7 +33,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+
+import java.util.HashMap;
 
 import br.com.victorpettengill.hawk_eyedcitizen.R;
 import br.com.victorpettengill.hawk_eyedcitizen.beans.Problem;
@@ -63,19 +57,8 @@ public class MainActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
     private Location currentLocation;
-    private DaoListener listener = new DaoListener() {
 
-        @Override
-        public void onObjectAdded(Object object) {
-
-        }
-
-        @Override
-        public void onError(String message) {
-            super.onError(message);
-        }
-
-    };
+    private HashMap<Problem, Marker> problemData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +92,7 @@ public class MainActivity extends AppCompatActivity
                     Log.i("result", "locationButton result");
 
                     if(locationResult != null) {
-
-
+                        
                         Location location = locationResult.getLastLocation();
 
                         ProblemDao.getInstance().getProblemsAtBounds(location.getLatitude(), location.getLongitude(), listener);
@@ -153,6 +135,22 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+    private DaoListener listener = new DaoListener() {
+
+        @Override
+        public void onObjectAdded(Object object) {
+
+            addProblemOntheMap((Problem) object, false);
+
+        }
+
+        @Override
+        public void onError(String message) {
+            super.onError(message);
+        }
+
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -206,9 +204,19 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onCameraIdle() {
 
+                ProblemDao.getInstance().getProblemsAtBounds(mMap.getCameraPosition().target.latitude, mMap.getCameraPosition().target.longitude, listener);
 
             }
 
+        });
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+
+
+
+            }
         });
 
         if (ContextCompat.checkSelfPermission(this,
@@ -235,12 +243,38 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void addProblemIntheMap(Problem problem, boolean animateTo) {
+    private void addProblemOntheMap(final Problem problem, final boolean animateTo) {
+
+        if(problem.getCategory() == null) {
+
+            ProblemDao.getInstance().getDataForProblem(problem, new DaoListener() {
+                @Override
+                public void onSuccess(Object object) {
+                    super.onSuccess(object);
+
+                    addMarker(problem, animateTo);
+
+                }
+
+                @Override
+                public void onError(String message) {
+                    super.onError(message);
+                }
+            });
+
+        } else {
+            addMarker(problem, animateTo);
+        }
+
+    }
+
+    private void addMarker(Problem problem, boolean animateTo) {
 
         Marker marker = mMap.addMarker(
                 new MarkerOptions().position(
                         new LatLng(problem.getLatitude(), problem.getLongitude())
                 ).title(problem.getCategory()));
+        marker.setTag(problem);
 
         if(animateTo) {
 
@@ -316,7 +350,7 @@ public class MainActivity extends AppCompatActivity
 
         if(requestCode == REQUEST_CREATE_PROBLEM) {
 
-            addProblemIntheMap((Problem) data.getParcelableExtra("problem"), true);
+            addProblemOntheMap((Problem) data.getParcelableExtra("problem"), true);
 
         }
 
