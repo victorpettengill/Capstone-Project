@@ -56,5 +56,6 @@
     <string name="select_location">Select location</string>
     <string name="description_mandatory">Describe the problem found.</string>
     <string name="category_mandatory">Please select the category</string>
+    <string name="title_activity_view_problem">ViewProblemActivity</string>
 
 </resources>

@@ -80,6 +80,8 @@ public class ProblemDao {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+                listener.onError(databaseError.getMessage());
+
             }
 
         });

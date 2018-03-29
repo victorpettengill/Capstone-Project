@@ -78,10 +78,10 @@
         <activity
             android:name=".ui.RegisterProblemActivity"
             android:label="@string/title_activity_register_problem"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.FindLocationActivity"
-            android:label="@string/title_activity_find_location"/>
+            android:label="@string/title_activity_find_location" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -93,6 +93,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity
+            android:name=".ui.ViewProblemActivity"
+            android:label="@string/title_activity_view_problem"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
