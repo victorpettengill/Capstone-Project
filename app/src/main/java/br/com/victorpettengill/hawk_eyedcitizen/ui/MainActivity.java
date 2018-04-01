@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity
                     Log.i("result", "locationButton result");
 
                     if(locationResult != null) {
-                        
+
                         Location location = locationResult.getLastLocation();
 
                         ProblemDao.getInstance().getProblemsAtBounds(location.getLatitude(), location.getLongitude(), listener);
@@ -214,7 +214,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onInfoWindowClick(Marker marker) {
 
-
+                Intent i = new Intent(MainActivity.this, ViewProblemActivity.class);
+                i.putExtra("problem", (Problem) marker.getTag());
+                startActivity(i);
 
             }
         });

@@ -56,6 +56,12 @@
     <string name="select_location">Select location</string>
     <string name="description_mandatory">Describe the problem found.</string>
     <string name="category_mandatory">Please select the category</string>
-    <string name="title_activity_view_problem">ViewProblemActivity</string>
+    <string name="title_activity_view_problem">Problem</string>
+    <string name="user">User:</string>
+    <string name="category">Category:</string>
+    <string name="problem_description">Problem description</string>
+    <string name="clap">Give a clap</string>
+    <string name="problem_solved">Problem solved</string>
+    <string name="share">Share problem</string>
 
 </resources>

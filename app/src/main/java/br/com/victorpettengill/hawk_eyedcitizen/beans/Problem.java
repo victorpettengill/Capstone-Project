@@ -45,6 +45,8 @@ public class Problem implements Parcelable{
         description = in.readString();
         latitude = in.readDouble();
         longitude = in.readDouble();
+        user = new User(in.readString());
+
     }
 
     public String getUid() {
@@ -116,8 +118,10 @@ public class Problem implements Parcelable{
         parcel.writeString(description);
         parcel.writeDouble(latitude);
         parcel.writeDouble(longitude);
+
+        if(user != null) {
+            parcel.writeString(user.getUid());
+        }
     }
-
-
 
 }

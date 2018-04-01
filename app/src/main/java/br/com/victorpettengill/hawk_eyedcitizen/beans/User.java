@@ -2,6 +2,8 @@ package br.com.victorpettengill.hawk_eyedcitizen.beans;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import br.com.victorpettengill.hawk_eyedcitizen.application.HawkEyedCitizen;
 
@@ -9,7 +11,7 @@ import br.com.victorpettengill.hawk_eyedcitizen.application.HawkEyedCitizen;
  * Created by appimagetech on 12/01/18.
  */
 
-public class User {
+public class User implements Parcelable{
 
     private String uid;
     private String name;
@@ -30,6 +32,25 @@ public class User {
         this.email = email;
         this.image = image;
     }
+
+    protected User(Parcel in) {
+        uid = in.readString();
+        name = in.readString();
+        email = in.readString();
+        image = in.readString();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
     public String getUid() {
         return uid;
@@ -100,4 +121,16 @@ public class User {
         return user;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(uid);
+        parcel.writeString(name);
+        parcel.writeString(email);
+        parcel.writeString(image);
+    }
 }

@@ -123,6 +123,42 @@ public class UserDao {
 
     }
 
+    public void getUserData(final User user, final DaoListener listener) {
+
+        reference.child(USERS_REFERENCE)
+                .child(user.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.getValue() != null) {
+
+                    HashMap<String, Object> map = (HashMap<String, Object>) dataSnapshot.getValue();
+                    user.setEmail((String) map.get("email"));
+                    user.setImage((String) map.get("image"));
+                    user.setName((String) map.get("name"));
+
+                    listener.onSuccess(user);
+
+                } else {
+
+                    listener.onError("User not found!");
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                listener.onError("User not found!");
+
+            }
+        });
+
+    }
+
     public void signUp(final Bitmap bitmap,
                        final String name,
                        final String email,
