@@ -16,10 +16,12 @@ import com.squareup.picasso.Picasso;
 import br.com.victorpettengill.hawk_eyedcitizen.R;
 import br.com.victorpettengill.hawk_eyedcitizen.beans.Problem;
 import br.com.victorpettengill.hawk_eyedcitizen.beans.User;
+import br.com.victorpettengill.hawk_eyedcitizen.dao.ProblemDao;
 import br.com.victorpettengill.hawk_eyedcitizen.dao.UserDao;
 import br.com.victorpettengill.hawk_eyedcitizen.listeners.DaoListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ViewProblemActivity extends AppCompatActivity {
 
@@ -77,6 +79,52 @@ public class ViewProblemActivity extends AppCompatActivity {
         } else {
             userInfo(problem.getUser());
         }
+
+        if(User.getInstance() != null && problem.getUser().getUid().equals(User.getInstance().getUid())) {
+
+//            clap.setVisibility(View.GONE);
+
+        }
+
+    }
+
+    @OnClick(R.id.clap) void clapProblem() {
+
+        ProblemDao.getInstance().clapProblem(problem, User.getInstance(), new DaoListener() {
+            @Override
+            public void onSuccess(Object object) {
+                super.onSuccess(object);
+
+            }
+
+            @Override
+            public void onError(String message) {
+                super.onError(message);
+            }
+        });
+
+    }
+
+    @OnClick(R.id.problem_solved) void problemSolved() {
+
+        ProblemDao.getInstance().solveProblem(problem, User.getInstance(), new DaoListener() {
+
+            @Override
+            public void onSuccess(Object object) {
+                super.onSuccess(object);
+            }
+
+            @Override
+            public void onError(String message) {
+                super.onError(message);
+            }
+
+        });
+
+    }
+
+    @OnClick(R.id.share) void shareProblem() {
+
 
 
     }

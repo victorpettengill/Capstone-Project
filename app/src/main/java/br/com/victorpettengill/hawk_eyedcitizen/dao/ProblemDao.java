@@ -16,6 +16,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -237,5 +239,155 @@ public class ProblemDao {
 
     }
 
+    public void clapProblem(Problem problem, final User user, final DaoListener listener) {
+
+        reference.child(problem.getUid()).runTransaction(new Transaction.Handler() {
+
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+
+                if(mutableData == null){
+                    return Transaction.success(mutableData);
+                }
+
+                HashMap<String, Object> map = (HashMap<String, Object>) mutableData.getValue();
+
+                if(map.containsKey("claps")) {
+
+                    HashMap<String, Boolean> claps = (HashMap<String, Boolean>) map.get("claps");
+
+                    if(claps.containsKey(user.getUid())) {
+
+                        claps.remove(user.getUid());
+
+                        long clapCount = (long) map.get("clapsCount") - 1;
+                        map.put("clapsCount", clapCount);
+
+                    } else {
+
+                        claps.put(user.getUid(), true);
+                        long clapCount = (long) map.get("clapsCount") + 1;
+                        map.put("clapsCount", clapCount);
+
+                    }
+
+                } else {
+
+                    HashMap<String, Boolean> claps = new HashMap<String, Boolean>();
+                    claps.put(user.getUid(), true);
+
+                    map.put("claps", claps);
+                    map.put("clapsCount", 1);
+
+                }
+
+                mutableData.setValue(map);
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                if(databaseError == null) {
+                    listener.onSuccess(null);
+                } else {
+                    listener.onError(databaseError.getMessage());
+                }
+
+            }
+
+        });
+
+    }
+
+    public void solveProblem(Problem problem, final User user, final DaoListener listener) {
+
+        if(user.getUid().equals(problem.getUser().getUid())) {
+
+            reference.child(problem.getUid()).child("solved").setValue(true);
+
+            areaReference.child(problem.getUid()).removeValue(new DatabaseReference.CompletionListener() {
+
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                    if(databaseError == null) {
+
+                        listener.onSuccess("Problem solved successfully");
+
+                    } else {
+
+                        listener.onError(databaseError.getMessage());
+
+                    }
+
+                }
+
+            });
+
+        } else {
+
+            reference.child(problem.getUid()).runTransaction(new Transaction.Handler() {
+
+                @Override
+                public Transaction.Result doTransaction(MutableData mutableData) {
+
+                    if(mutableData == null){
+                        return Transaction.success(mutableData);
+                    }
+
+                    HashMap<String, Object> map = (HashMap<String, Object>) mutableData.getValue();
+
+                    if(map.containsKey("solvedMap")) {
+
+                        HashMap<String, Boolean> solvedMap = (HashMap<String, Boolean>) map.get("solvedMap");
+
+                        if(solvedMap.containsKey(user.getUid())) {
+
+                            solvedMap.remove(user.getUid());
+
+                            long clapCount = (long) map.get("solvedCount") - 1;
+                            map.put("solvedCount", clapCount);
+
+                        } else {
+
+                            solvedMap.put(user.getUid(), true);
+                            long clapCount = (long) map.get("solvedCount") + 1;
+                            map.put("solvedCount", clapCount);
+
+                        }
+
+                    } else {
+
+                        HashMap<String, Boolean> solvedMap = new HashMap<String, Boolean>();
+                        solvedMap.put(user.getUid(), true);
+
+                        map.put("solvedMap", solvedMap);
+                        map.put("solvedCount", 1);
+
+                    }
+
+                    mutableData.setValue(map);
+
+                    return Transaction.success(mutableData);
+                }
+
+                @Override
+                public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+
+                    if(databaseError == null) {
+                        listener.onSuccess(null);
+                    } else {
+                        listener.onError(databaseError.getMessage());
+                    }
+
+                }
+
+            });
+
+        }
+
+    }
 
 }

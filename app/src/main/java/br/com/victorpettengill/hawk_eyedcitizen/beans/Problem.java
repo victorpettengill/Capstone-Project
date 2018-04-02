@@ -3,7 +3,7 @@ package br.com.victorpettengill.hawk_eyedcitizen.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.firebase.geofire.GeoLocation;
+import java.util.HashMap;
 
 /**
  * Created by appimagetech on 11/01/18.
@@ -29,6 +29,11 @@ public class Problem implements Parcelable{
     private String description;
     private double latitude;
     private double longitude;
+    private boolean solved;
+    private long clapsCount;
+    private int solvedCount;
+    private HashMap<String, Boolean> claps;
+    private HashMap<String, Boolean> solvedMap;
 
     public Problem() {
 
@@ -45,6 +50,10 @@ public class Problem implements Parcelable{
         description = in.readString();
         latitude = in.readDouble();
         longitude = in.readDouble();
+        solved = in.readInt() == 1;
+        clapsCount = in.readLong();
+        solvedCount = in.readInt();
+
         user = new User(in.readString());
 
     }
@@ -118,6 +127,9 @@ public class Problem implements Parcelable{
         parcel.writeString(description);
         parcel.writeDouble(latitude);
         parcel.writeDouble(longitude);
+        parcel.writeInt(solved ? 1 : 0);
+        parcel.writeLong(clapsCount);
+        parcel.writeInt(solvedCount);
 
         if(user != null) {
             parcel.writeString(user.getUid());

@@ -61,7 +61,7 @@
     <string name="category">Category:</string>
     <string name="problem_description">Problem description</string>
     <string name="clap">Give a clap</string>
-    <string name="problem_solved">Problem solved</string>
+    <string name="problem_solved">Mark as solved</string>
     <string name="share">Share problem</string>
 
 </resources>
