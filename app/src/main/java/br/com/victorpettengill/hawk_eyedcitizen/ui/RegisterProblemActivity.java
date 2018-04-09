@@ -290,6 +290,9 @@ public class RegisterProblemActivity extends AppCompatActivity {
 
             return true;
         } else {
+
+            finish();
+
             return super.onOptionsItemSelected(item);
         }
     }

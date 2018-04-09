@@ -182,11 +182,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.nav_manage) {
-
         } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 
@@ -350,7 +346,7 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == REQUEST_CREATE_PROBLEM) {
+        if(requestCode == REQUEST_CREATE_PROBLEM && resultCode == RESULT_OK) {
 
             addProblemOntheMap((Problem) data.getParcelableExtra("problem"), true);
 
