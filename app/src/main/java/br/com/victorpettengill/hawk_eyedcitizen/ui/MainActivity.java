@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -57,8 +58,24 @@ public class MainActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
     private Location currentLocation;
+    private View headerView;
 
     private HashMap<Problem, Marker> problemData;
+    private DaoListener listener = new DaoListener() {
+
+        @Override
+        public void onObjectAdded(Object object) {
+
+            addProblemOntheMap((Problem) object, false);
+
+        }
+
+        @Override
+        public void onError(String message) {
+            super.onError(message);
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +93,10 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        headerView = View.inflate(MainActivity.this, R.layout.nav_header_main, null);
+
+        navigationView.addHeaderView(headerView);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -111,6 +132,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void showUserInfo() {
+
+
+
+    }
+
     @OnClick(R.id.fab) void addProblem() {
 
         Intent i = new Intent(MainActivity.this, RegisterProblemActivity.class);
@@ -135,22 +162,6 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
-    private DaoListener listener = new DaoListener() {
-
-        @Override
-        public void onObjectAdded(Object object) {
-
-            addProblemOntheMap((Problem) object, false);
-
-        }
-
-        @Override
-        public void onError(String message) {
-            super.onError(message);
-        }
-
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
